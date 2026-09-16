@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PPE Violations</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .page {
+            padding: 30px;
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin-top: 7px;
+            color: #6b7280;
+        }
+
+        .refresh-btn {
+            border: none;
+            background: #111827;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: #374151;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .summary-title {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .danger {
+            color: #dc2626;
+        }
+
+        .success {
+            color: #16a34a;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        thead {
+            background: #111827;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .evidence {
+            width: 150px;
+            height: 95px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+
+        .no-image {
+            width: 150px;
+            height: 95px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .violation-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fee2e2;
+            color: #b91c1c;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .email-sent {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #15803d;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .email-pending {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fef3c7;
+            color: #92400e;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .email-failed {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fee2e2;
+            color: #b91c1c;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .camera-id {
+            font-weight: bold;
+        }
+
+        .location {
+            color: #4b5563;
+        }
+
+        .tracking-id {
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .confidence {
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px;
+            color: #6b7280;
+        }
+
+        /* Image popup */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+
+        .close {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+
+            .page {
+                padding: 15px;
+            }
+
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+
+        <div>
+            <h1>🚨 PPE Violations</h1>
+            <p>
+                NO HELMET detection history and evidence
+            </p>
+        </div>
+
+        <button
+            class="refresh-btn"
+            onclick="loadViolations()"
+        >
+            ↻ Refresh
+        </button>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="summary">
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                TOTAL VIOLATIONS
+            </div>
+
+            <div
+                class="summary-value danger"
+                id="totalViolations"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                E-MAIL SENT
+            </div>
+
+            <div
+                class="summary-value success"
+                id="emailSent"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                EMAIL PENDING
+            </div>
+
+            <div
+                class="summary-value"
+                id="emailPending"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                EMAIL FAILED
+            </div>
+
+            <div
+                class="summary-value danger"
+                id="emailFailed"
+            >
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- VIOLATION TABLE -->
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Evidence</th>
+
+                    <th>Detection</th>
+
+                    <th>Camera</th>
+
+                    <th>Location</th>
+
+                    <th>Tracking ID</th>
+
+                    <th>Confidence</th>
+
+                    <th>Date / Time</th>
+
+                    <th>Email</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="violationsBody">
+
+                <tr>
+
+                    <td
+                        colspan="9"
+                        class="empty"
+                    >
+                        Loading violations...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- IMAGE MODAL -->
+
+<div
+    class="modal"
+    id="imageModal"
+    onclick="closeImage()"
+>
+
+    <span
+        class="close"
+        onclick="closeImage()"
+    >
+        &times;
+    </span>
+
+    <img
+        id="modalImage"
+        src=""
+        alt="Evidence"
+    >
+
+</div>
+
+
+<script>
+
+async function loadViolations() {
+
+    const body = document.getElementById(
+        "violationsBody"
+    );
+
+    try {
+
+        const response = await fetch(
+            "/api/violations"
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP " + response.status
+            );
+
+        }
+
+        const data = await response.json();
+
+        /*
+         * Support both:
+         *
+         * [
+         *   {...}
+         * ]
+         *
+         * and:
+         *
+         * {
+         *   "violations": [...]
+         * }
+         */
+
+        let violations = [];
+
+        if (Array.isArray(data)) {
+
+            violations = data;
+
+        } else if (
+            data &&
+            Array.isArray(data.violations)
+        ) {
+
+            violations = data.violations;
+
+        }
+
+        updateSummary(violations);
+
+        if (violations.length === 0) {
+
+            body.innerHTML = `
+                <tr>
+                    <td
+                        colspan="9"
+                        class="empty"
+                    >
+                        No PPE violations recorded yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        body.innerHTML = violations
+            .map(renderViolation)
+            .join("");
+
+    } catch (error) {
+
+        console.error(
+            "Violation API error:",
+            error
+        );
+
+        body.innerHTML = `
+            <tr>
+                <td
+                    colspan="9"
+                    class="empty"
+                >
+                    Could not load violations.
+                    <br><br>
+                    ${escapeHtml(error.message)}
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+
+function updateSummary(violations) {
+
+    let sent = 0;
+    let pending = 0;
+    let failed = 0;
+
+    violations.forEach(v => {
+
+        const status = String(
+            v.email_status || "PENDING"
+        ).toUpperCase();
+
+        if (status === "SENT") {
+
+            sent++;
+
+        } else if (status === "FAILED") {
+
+            failed++;
+
+        } else {
+
+            pending++;
+        }
+
+    });
+
+    document.getElementById(
+        "totalViolations"
+    ).textContent = violations.length;
+
+    document.getElementById(
+        "emailSent"
+    ).textContent = sent;
+
+    document.getElementById(
+        "emailPending"
+    ).textContent = pending;
+
+    document.getElementById(
+        "emailFailed"
+    ).textContent = failed;
+}
+
+
+/* ============================================================
+   RENDER ROW
+   ============================================================ */
+
+function renderViolation(v) {
+
+    const id = v.id ?? "-";
+
+    const camera = v.camera_id ?? "-";
+
+    const location = v.location ?? "Unknown";
+
+    const trackingId =
+        v.tracking_id ?? "-";
+
+    const detection =
+        v.detection ?? "NO_HELMET";
+
+    const confidence =
+        v.confidence != null
+            ? (Number(v.confidence) * 100).toFixed(1) + "%"
+            : "-";
+
+    const timestamp =
+        v.timestamp ?? "-";
+
+    const emailStatus =
+        String(
+            v.email_status || "PENDING"
+        ).toUpperCase();
+
+
+    /* --------------------------------------------------------
+       Evidence image
+       -------------------------------------------------------- */
+
+    let evidence = `
+        <div class="no-image">
+            No photo
+        </div>
+    `;
+
+    if (v.evidence_path) {
+
+        let imageUrl = v.evidence_path;
+
+        /*
+         * Convert local evidence path into
+         * the Flask evidence URL.
+         */
+
+        imageUrl = imageUrl
+            .replace(/^.*evidence[\\/]/, "/evidence/");
+
+        evidence = `
+            <img
+                class="evidence"
+                src="${escapeHtml(imageUrl)}"
+                alt="PPE Evidence"
+                onclick="openImage(
+                    '${escapeJs(imageUrl)}'
+                )"
+                onerror="this.style.display='none'"
+            >
+        `;
+    }
+
+
+    /* --------------------------------------------------------
+       Email status
+       -------------------------------------------------------- */
+
+    let emailBadge = "";
+
+    if (emailStatus === "SENT") {
+
+        emailBadge = `
+            <span class="email-sent">
+                ✓ SENT
+            </span>
+        `;
+
+    } else if (emailStatus === "FAILED") {
+
+        emailBadge = `
+            <span class="email-failed">
+                ✕ FAILED
+            </span>
+        `;
+
+    } else {
+
+        emailBadge = `
+            <span class="email-pending">
+                ⏳ PENDING
+            </span>
+        `;
+    }
+
+
+    return `
+
+        <tr>
+
+            <td>
+                <strong>
+                    #${escapeHtml(String(id))}
+                </strong>
+            </td>
+
+            <td>
+                ${evidence}
+            </td>
+
+            <td>
+
+                <span class="violation-badge">
+                    🚨 ${escapeHtml(
+                        String(detection)
+                    )}
+                </span>
+
+            </td>
+
+            <td>
+
+                <span class="camera-id">
+                    ${escapeHtml(
+                        String(camera)
+                    )}
+                </span>
+
+            </td>
+
+            <td>
+
+                <span class="location">
+                    📍 ${escapeHtml(
+                        String(location)
+                    )}
+                </span>
+
+            </td>
+
+            <td>
+
+                <span class="tracking-id">
+                    ID ${escapeHtml(
+                        String(trackingId)
+                    )}
+                </span>
+
+            </td>
+
+            <td>
+
+                <span class="confidence">
+                    ${escapeHtml(
+                        confidence
+                    )}
+                </span>
+
+            </td>
+
+            <td>
+
+                ${escapeHtml(
+                    String(timestamp)
+                )}
+
+            </td>
+
+            <td>
+
+                ${emailBadge}
+
+            </td>
+
+        </tr>
+
+    `;
+}
+
+
+/* ============================================================
+   IMAGE MODAL
+   ============================================================ */
+
+function openImage(src) {
+
+    document.getElementById(
+        "modalImage"
+    ).src = src;
+
+    document.getElementById(
+        "imageModal"
+    ).style.display = "flex";
+}
+
+
+function closeImage() {
+
+    document.getElementById(
+        "imageModal"
+    ).style.display = "none";
+
+    document.getElementById(
+        "modalImage"
+    ).src = "";
+}
+
+
+/* ============================================================
+   SECURITY HELPERS
+   ============================================================ */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function escapeJs(value) {
+
+    return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"');
+}
+
+
+/* ============================================================
+   INITIAL LOAD
+   ============================================================ */
+
+loadViolations();
+
+
+/* ============================================================
+   AUTO REFRESH
+   ============================================================ */
+
+setInterval(
+    loadViolations,
+    5000
+);
+
+</script>
+
+</body>
+</html>

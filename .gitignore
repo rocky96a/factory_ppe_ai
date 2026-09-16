@@ -1,0 +1,29 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Runtime data
+*.db
+evidence/
+logs/
+runs/
+
+# ML datasets
+datasets/
+
+# ML model weights
+models/*.pt
+*.pt
+
+# Generated/test images
+helmet_test.jpg
+nohelmet_training_sample.jpg
+
+# Backup files
+*.save
+*.backup*

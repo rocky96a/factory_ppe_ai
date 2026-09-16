@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Cameras - Factory PPE AI</title>
+
+    <link rel="stylesheet"
+          href="/static/css/dashboard.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>Camera Management</h1>
+
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/cameras">Cameras</a>
+        <a href="/violations">Violations</a>
+    </nav>
+
+</header>
+
+
+<main>
+
+    <h2>Configured Cameras</h2>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Camera</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Status</th>
+            </tr>
+
+        </thead>
+
+        <tbody id="cameraTable">
+        </tbody>
+
+    </table>
+
+</main>
+
+
+<script>
+
+async function loadCameras() {
+
+    const response =
+        await fetch("/api/cameras");
+
+    const data =
+        await response.json();
+
+    const table =
+        document.getElementById(
+            "cameraTable"
+        );
+
+    table.innerHTML = "";
+
+    data.cameras.forEach(camera => {
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>${camera.camera_id}</td>
+
+                <td>${camera.name}</td>
+
+                <td>${camera.location}</td>
+
+                <td>
+                    ${
+                        camera.enabled
+                        ? "ONLINE"
+                        : "DISABLED"
+                    }
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+loadCameras();
+
+</script>
+
+</body>
+
+</html>

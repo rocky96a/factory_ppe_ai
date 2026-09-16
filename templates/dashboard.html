@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Factory PPE AI</title>
+
+    <link rel="stylesheet"
+          href="/static/css/dashboard.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>Factory PPE AI</h1>
+
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/cameras">Cameras</a>
+        <a href="/violations">Violations</a>
+    </nav>
+
+</header>
+
+
+<main>
+
+    <section class="stats">
+
+        <div class="card">
+
+            <h3>Cameras</h3>
+
+            <div id="cameraCount">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="card danger">
+
+            <h3>Violations</h3>
+
+            <div id="violationCount">
+                0
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section>
+
+        <h2>Live Cameras</h2>
+
+        <div id="cameraGrid"
+             class="camera-grid">
+        </div>
+
+    </section>
+
+
+    <section>
+
+        <h2>Recent Violations</h2>
+
+        <div id="violations">
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="/static/js/dashboard.js"></script>
+
+</body>
+
+</html>
