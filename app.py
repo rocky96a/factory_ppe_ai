@@ -26,6 +26,7 @@ from cameras.camera_manager import (
 from api.cameras import cameras_bp
 from api.violations import violations_bp
 from api.dashboard import dashboard_bp
+from api.browser_camera import browser_camera_bp
 
 
 # ============================================================
@@ -187,6 +188,7 @@ app.register_blueprint(cameras_bp)
 app.register_blueprint(violations_bp)
 
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(browser_camera_bp)
 
 
 # ============================================================

@@ -52,12 +52,18 @@
 
         <div class="browser-camera-card">
 
-            <video
-                id="browserCamera"
-                autoplay
-                playsinline
-                muted>
-            </video>
+            <div class="browser-video-wrapper">
+
+                <video
+                    id="browserCamera"
+                    autoplay
+                    playsinline
+                    muted>
+                </video>
+
+                <canvas id="browserOverlay"></canvas>
+
+            </div>
 
             <div class="camera-controls">
 
